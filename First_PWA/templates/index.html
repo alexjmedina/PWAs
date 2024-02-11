@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LinkedIn Content Creator</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        h1, h2, input, button {
+            margin-bottom: 20px;
+        }
+        button {
+            border-radius: 20px;
+            padding: 10px 24px;  /* Increase padding to make buttons bigger */
+            font-size: 18px;  /* Increase font size */
+        }
+    </style>
+</head>
+<body>
+    <h1>LinkedIn Content Creator</h1>
+    <h2>Extract Data from YouTube Videos</h2>
+    <div id="inputFields">
+        <input type="text" id="url1" placeholder="Enter YouTube video URL"><br>
+        <input type="text" id="url2" placeholder="Enter YouTube video URL"><br>
+        <input type="text" id="url3" placeholder="Enter YouTube video URL"><br>
+    </div>
+    <button onclick="addUrlField()">Add Another URL</button><br>
+    <button onclick="extractContent()">Extract Content</button>
+    <div id="content"></div>
+
+    <script>
+        // Register the service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js');
+            });
+        }
+
+        // Function to add another URL input field
+        function addUrlField() {
+            var inputFields = document.getElementById('inputFields');
+            var newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.placeholder = 'Enter YouTube video URL';
+            inputFields.appendChild(newInput);
+            inputFields.appendChild(document.createElement('br'));
+        }
+
+        // Function to extract content from YouTube video
+        function extractContent() {
+            var url1 = document.getElementById('url1').value;
+            var url2 = document.getElementById('url2').value;
+            var url3 = document.getElementById('url3').value;
+            // Use YouTube Data API to extract content
+            fetch('https://www.googleapis.com/youtube/v3/videos?id=' + url1 + '&key=AIzaSyCleznlVfWN2_4rXEBqukYtiYImZ95S3LY')
+                .then(response => response.json())
+                .then(data => {
+                    var content = document.getElementById('content');
+                    content.innerHTML = '<h2>' + data.items[0].snippet.title + '</h2>';
+                    content.innerHTML += '<p>' + data.items[0].snippet.description + '</p>';
+                    // Save the content to a file
+                    var blob = new Blob([content.innerHTML], {type: "text/plain;charset=utf-8"});
+                    saveAs(blob, "content.txt");
+                });
+        }
+    </script>
+</body>
+</html>
