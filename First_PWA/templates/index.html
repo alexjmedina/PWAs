@@ -4,13 +4,40 @@
     <title>LinkedIn Content Creator</title>
     <link rel="manifest" href="/manifest.json">
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
         h1, h2, input, button {
             margin-bottom: 20px;
+            text-align: center;
         }
         button {
             border-radius: 20px;
-            padding: 10px 24px;  /* Increase padding to make buttons bigger */
-            font-size: 18px;  /* Increase font size */
+            padding: 10px 24px;
+            font-size: 18px;
+        }
+        #inputFields {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            input, button {
+                width: 100%;
+            }
         }
     </style>
 </head>
