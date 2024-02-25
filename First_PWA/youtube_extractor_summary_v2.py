@@ -56,10 +56,11 @@ def summarize():
 
     # Simplified access to summary content
     try:
-        summary_content = response.choices[0].message['content'] if response.choices else "Summary not available."
+        summary_content = response.choices[0].message.content if response.choices else "Summary not available."
     except AttributeError:
         summary_content = "Summary not available."
 
+    print(summary_content)
     return jsonify({'summary': summary_content})
 
 if __name__ == '__main__':
