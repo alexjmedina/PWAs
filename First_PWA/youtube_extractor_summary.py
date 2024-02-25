@@ -2,13 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from pytube import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
 import yaml
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-# Access the environment variable
-credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+import vertexai
 
 app = Flask(__name__)
 
@@ -29,6 +24,20 @@ def extract():
     with open('data.yaml', 'w') as f:
         yaml.dump(data, f)
     return jsonify(data)
+
+@app.route('/summarize', methods=['POST'])
+def summarize():
+    with open('data.yaml', 'r') as f:
+        data = yaml.safe_load(f)
+
+    text_to_summarize = data.get('transcript')
+
+    # Use Vertex AI Gemini for text summarization
+    client = vertexai.GeminiClient(project="educa-admin", location="northamerica-northeast1")
+    response = client.generate_text(text_to_summarize, model_name="gemini-1.0-pro-vision-001")
+    summary = response.text
+
+    return jsonify({'summary': summary})
 
 if __name__ == '__main__':
     app.run(debug=True)

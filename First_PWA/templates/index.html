@@ -1,92 +1,101 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>LinkedIn Content Creator</title>
-        <link rel="manifest" href="/manifest.json">
-        <style>
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 0;
-                margin: 0;
-                font-family: Arial, sans-serif;
-            }
-            h1, h2, input, button {
-                margin-bottom: 20px;
-                text-align: center;
-            }
-            button {
-                border-radius: 20px;
-                padding: 10px 24px;
-                font-size: 18px;
-            }
-            #inputFields {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            input {
-                margin-bottom: 10px;
-                text-align: center;
-            }
-            @media (max-width: 600px) {
-                body {
-                    padding: 10px;
-                }
-                input, button {
-                    width: 100%;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <h1>LinkedIn Content Creator</h1>
-        <h2>Extract Data from YouTube Videos</h2>
-        <div id="inputFields">
-            <input type="text" id="url1" placeholder="Enter YouTube video URL"><br>
-            <!-- This is a comment
-            <input type="text" id="url2" placeholder="Enter YouTube video URL"><br>
-            <input type="text" id="url3" placeholder="Enter YouTube video URL"><br>  -->
-        </div>
-        <button onclick="addUrlField()">Add Another URL</button><br>
-        <button onclick="extractContent()">Extract Content</button>
-        <div id="content"></div>
+  <head>
+    <title>LinkedIn Content Creator</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      h1,
+      h2,
+      input,
+      button {
+        margin-bottom: 30px;
+        text-align: left;
+      }
+      button {
+        border-radius: 20px;
+        padding: 10px 24px;
+        font-size: 18px;
+      }
+      #inputFields {
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+      }
+      input {
+        margin-bottom: 10px;
+        text-align: left;
+      }
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        input,
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>LinkedIn Content Creator</h1>
+    <h2>Extract Data from YouTube Videos</h2>
+    <div id="inputFields">
+      <input type="text" id="url1" placeholder="Enter YouTube video URL"><br>
+      </div>
+    <button onclick="addUrlField()">Add Another URL</button><br>
+    <button onclick="extractContent()">Extract Content</button>
+    <div id="content"></div>
 
-        <script>
-            // Register the service worker
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/service-worker.js');
-                });
-            }
+    <script>
+      // Register the service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/service-worker.js');
+        });
+      }
 
-            // Function to add another URL input field
-            function addUrlField() {
-                var inputFields = document.getElementById('inputFields');
-                var newInput = document.createElement('input');
-                newInput.type = 'text';
-                newInput.placeholder = 'Enter YouTube video URL';
-                inputFields.appendChild(newInput);
-                inputFields.appendChild(document.createElement('br'));
-            }
+      // Function to add another URL input field
+      function addUrlField() {
+        var inputFields = document.getElementById('inputFields');
+        var newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.placeholder = 'Enter YouTube video URL';
+        inputFields.appendChild(newInput);
+        inputFields.appendChild(document.createElement('br'));
+      }
 
-            // Function to extract content from YouTube video
-            function extractContent() {
-                var url1 = document.getElementById('url1').value;
-                fetch('/extract', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ url: url1 }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    var content = document.getElementById('content');
-                });
-            }
-        </script>
-    </body>
+      // Function to extract content from YouTube video
+      function extractContent() {
+        var url1 = document.getElementById('url1').value;
+
+        fetch('/extract', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url: url1 }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            fetch('/summarize', {
+              method: 'POST',
+            })
+              .then(response => response.json())
+              .then(summaryData => {
+                var content = document.getElementById('content');
+                content.innerHTML = summaryData.summary;
+              });
+          });
+      }
+    </script>
+  </body>
 </html>
