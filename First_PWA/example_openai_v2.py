@@ -16,9 +16,10 @@ def summarize_text(text, chunk_size=4000):
                 {"role": "user", "content": f"Please, summarize this text: {part}"}
             ]
         )
-        # Assuming 'choices' and 'message' are correct. Adjust based on actual response structure.
         if completion.choices:
-            summary_content = completion.choices[0].message['content']  # Correctly access the 'content'
+            # Assuming the first choice is the one we're interested in.
+            # Here, we access the text attribute directly.
+            summary_content = completion.choices[0].message.content  # Correctly access the text content
             summaries.append(summary_content)
         else:
             summaries.append("Summary not available.")
