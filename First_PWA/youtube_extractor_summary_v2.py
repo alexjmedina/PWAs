@@ -48,7 +48,14 @@ def summarize():
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"Summarize this text: {text_to_summarize}"}
+            {"role": "user", "content": f"Summarize the provided content by extracting its key points, focusing on the process or system described, 
+             including any significant outcomes, methods, or insights. The summary should clearly outline:
+            - The main objective or purpose of the content.
+            - The step-by-step process or system that was developed or utilized.
+            - Key results, benefits, or insights gained from this process.
+            - Any notable techniques, technologies, or methodologies mentioned.
+            - The potential applications or implications of this system for others.
+            Please format the summary as follows: Summary of the Content: [Brief overview], Key Points: [Bulleted list of key points, findings, or steps]: {text_to_summarize}"}
         ],
         max_tokens=150,
         temperature=0.7,
