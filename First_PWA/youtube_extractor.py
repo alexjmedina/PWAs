@@ -2,13 +2,6 @@ from flask import Flask, render_template, request, jsonify
 from pytube import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
 import yaml
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# Access the environment variable
-credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 app = Flask(__name__)
 
