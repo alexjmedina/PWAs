@@ -43,15 +43,26 @@ def summarize():
     
     client = OpenAI()
 
+    #response = client.chat.completions.create(
+    #response = openai.ChatCompletion.create(
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",  # Adjust according to the latest available version
-        messages=f"Summarize this text: {text_to_summarize}",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": f"Summarize this text: {text_to_summarize}"}
+        ],
         max_tokens=150,
         temperature=0.7,
     )
-    #summary = response.choices[0].text.strip()
+    # Assuming the response structure is similar to the one you've tried accessing,
+    # and correcting it based on the typical response format
+    # Note: The API response structure can vary, ensure to align with the current API documentation
+    summary = response['choices'][0]['message']['content'].strip() if response['choices'] else "No summary available."
+
+    #summary = response.choices[0].message['content'].strip()
     #summary = response.get('choices')[0].get('text').strip()
-    summary = response.choices[0].text.strip()
+    #summary = response.choices[0].text.strip()
+    #summary = response.choices[0].content.strip()
 
     return jsonify({'summary': summary})
 
