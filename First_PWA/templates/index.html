@@ -22,7 +22,7 @@
       }
       button {
         border-radius: 20px;
-        padding: 10px 24px;
+        padding: 12px 30px;
         font-size: 18px;
       }
       #inputFields {
@@ -74,28 +74,37 @@
       }
 
       // Function to extract content from YouTube video
-      function extractContent() {
-        var url1 = document.getElementById('url1').value;
-
-        fetch('/extract', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ url: url1 }),
-        })
-          .then(response => response.json())
-          .then(data => {
-            fetch('/summarize', {
-              method: 'POST',
-            })
-              .then(response => response.json())
-              .then(summaryData => {
-                var content = document.getElementById('content');
-                content.innerHTML = summaryData.summary;
-              });
-          });
-      }
+            function extractContent() {
+                var inputFields = document.getElementById('inputFields').getElementsByTagName('input');
+                for (let i = 0; i < inputFields.length; i++) {
+                    let url = inputFields[i].value;
+                    fetch('/extract', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: url }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Assuming you want to summarize each video individually
+                        fetch('/summarize', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            // You need to modify the Python code to accept and use this data for summarization
+                            body: JSON.stringify({ transcript: data.transcript }), 
+                        })
+                        .then(response => response.json())
+                        .then(summaryData => {
+                            var content = document.getElementById('content');
+                            // Consider appending each summary instead of replacing the innerHTML
+                            content.innerHTML += `<p>${summaryData.summary}</p>`;
+                        });
+                    });
+                }
+            }
     </script>
   </body>
 </html>
