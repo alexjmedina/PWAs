@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify
-from pytube import YouTube
-from youtube_transcript_api import YouTubeTranscriptApi
-import yaml
 import os
+import yaml
+from pytube import YouTube
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 import openai
 from openai import OpenAI
 
@@ -24,8 +24,8 @@ def extract():
     video_id = url.split('=')[-1]
     try:
         transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-        transcript_text = ' '.join([item['text'] for item in transcript_list]) if transcript_list else ''
-    except:
+        transcript_text = ' '.join([item['text'] for item in transcript_list])
+    except TranscriptsDisabled:
         transcript_text = "Transcript not available."
     data = {'title': title, 'description': description, 'transcript': transcript_text}
     with open('data.yaml', 'w') as f:
@@ -34,17 +34,18 @@ def extract():
 
 @app.route('/summarize', methods=['POST'])
 def summarize():
-    # Assuming you've loaded your data into `data` from 'data.yaml'
-    # and it includes a 'transcript' key with the text to summarize.
-    with open('data.yaml', 'r') as f:
-        data = yaml.safe_load(f)
-    
+    try:
+        with open('data.yaml', 'r') as f:
+            data = yaml.safe_load(f)
+    except FileNotFoundError:
+        return jsonify({'error': 'Data file not found. Please extract data first.'}), 404
+
     text_to_summarize = data.get('transcript', '')
     
     client = OpenAI()
 
     response = client.chat.completions.create(
-        model="gpt-4",  # Adjust according to the latest available version
+        model="gpt-4",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": f"Summarize this text: {text_to_summarize}"}
@@ -52,19 +53,14 @@ def summarize():
         max_tokens=150,
         temperature=0.7,
     )
-    
-    # Assuming the response follows the expected chat completion structure
-    if response['choices'] and len(response['choices'][0]['message']) > 0:
-        # Extracting the last message content from the first choice's messages
-        summary_messages = response['choices'][0]['message']
-        summary_content = summary_messages[-1]['content']  # This assumes the last message contains the summary
-    else:
+
+    # Simplified access to summary content
+    try:
+        summary_content = response.choices[0].message['content'] if response.choices else "Summary not available."
+    except AttributeError:
         summary_content = "Summary not available."
 
-    #print(response.choices[0].text.strip())
-    
     return jsonify({'summary': summary_content})
-    #return jsonify({'summary': summary})
 
 if __name__ == '__main__':
     app.run(debug=True)
