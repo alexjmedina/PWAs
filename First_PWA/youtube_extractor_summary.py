@@ -4,6 +4,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import yaml
 import os
 import openai
+from openai import OpenAI
 
 app = Flask(__name__)
 
@@ -33,23 +34,24 @@ def extract():
 
 @app.route('/summarize', methods=['POST'])
 def summarize():
+    # Assuming you've loaded your data into `data` from 'data.yaml'
+    # and it includes a 'transcript' key with the text to summarize.
     with open('data.yaml', 'r') as f:
         data = yaml.safe_load(f)
-
+    
     text_to_summarize = data.get('transcript', '')
+    
+    client = OpenAI()
 
-    # Adjusted for GPT-4.0
-    response = openai.Completion.create(
-        model="text-davinci-004",  # Use the model identifier for GPT-4.0
-        prompt=f"Summarize this text: {text_to_summarize}",
-        max_tokens=150,  # Adjust max_tokens as needed
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",  # Adjust according to the latest available version
+        messages=f"Summarize this text: {text_to_summarize}",
+        max_tokens=150,
         temperature=0.7,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0
     )
     #summary = response.choices[0].text.strip()
-    summary = response.get('choices')[0].get('text').strip()
+    #summary = response.get('choices')[0].get('text').strip()
+    summary = response.choices[0].text.strip()
 
     return jsonify({'summary': summary})
 
