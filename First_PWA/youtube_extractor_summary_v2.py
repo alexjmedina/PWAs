@@ -57,7 +57,7 @@ def summarize():
             - The potential applications or implications of this system for others.
             Please format the summary as follows: Summary of the Content: [Brief overview], Key Points: [Bulleted list of key points, findings, or steps]: {text_to_summarize}"""}
         ],
-        max_tokens=150,
+        max_tokens=200,
         temperature=0.7,
     )
 
