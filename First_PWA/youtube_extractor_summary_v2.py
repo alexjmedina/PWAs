@@ -61,7 +61,7 @@ def summarize():
         summary_content = "Summary not available."
 
     print(summary_content)
-    return jsonify({'summary': summary_content})
+    return jsonify()
 
 if __name__ == '__main__':
     app.run(debug=True)
