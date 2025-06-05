@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPIs Social Extractor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(76, 201, 240, 0.25);
+        }
+        
+        .platform-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .facebook-color { color: #1877f2; }
+        .instagram-color { color: #e4405f; }
+        .twitter-color { color: #1da1f2; }
+        .linkedin-color { color: #0077b5; }
+        .youtube-color { color: #ff0000; }
+        .tiktok-color { color: #000000; }
+        
+        .result-card {
+            display: none;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .metric-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .engagement-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .engagement-metric {
+            flex: 1;
+            min-width: 120px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .engagement-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .engagement-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding: 20px 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-line-fill me-2"></i>
+                KPIs Social Extractor
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h1 class="display-5 fw-bold">Extract Social Media KPIs</h1>
+                <p class="lead">Enter the URLs of your social media profiles to automatically extract followers and engagement metrics.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-link-45deg"></i> Enter Social Media URLs
+                    </div>
+                    <div class="card-body">
+                        <form id="extractionForm">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-globe platform-icon"></i>
+                                    Website URL
+                                </label>
+                                <input type="url" class="form-control" id="websiteUrl" placeholder="https://example.com">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-facebook platform-icon facebook-color"></i>
+                                    Facebook Page URL
+                                </label>
+                                <input type="url" class="form-control" id="facebookUrl" placeholder="https://facebook.com/example">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-instagram platform-icon instagram-color"></i>
+                                    Instagram Profile URL
+                                </label>
+                                <input type="url" class="form-control" id="instagramUrl" placeholder="https://instagram.com/example">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-youtube platform-icon youtube-color"></i>
+                                    YouTube Channel URL
+                                </label>
+                                <input type="url" class="form-control" id="youtubeUrl" placeholder="https://youtube.com/c/example">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-linkedin platform-icon linkedin-color"></i>
+                                    LinkedIn Page URL
+                                </label>
+                                <input type="url" class="form-control" id="linkedinUrl" placeholder="https://linkedin.com/company/example">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-twitter platform-icon twitter-color"></i>
+                                    Twitter/X Profile URL
+                                </label>
+                                <input type="url" class="form-control" id="twitterUrl" placeholder="https://twitter.com/example">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-tiktok platform-icon tiktok-color"></i>
+                                    TikTok Profile URL
+                                </label>
+                                <input type="url" class="form-control" id="tiktokUrl" placeholder="https://tiktok.com/@example">
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="bi bi-search me-2"></i>Extract KPIs
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loader" id="loader"></div>
+        
+        <div class="row mt-4 result-card" id="resultsContainer">
+            <div class="col-lg-10 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-graph-up"></i> Extraction Results
+                    </div>
+                    <div class="card-body">
+                        <div id="websiteResults" class="mb-4">
+                            <h3><i class="bi bi-globe me-2"></i>Website</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="metric-label">Title</div>
+                                        <div class="h4" id="websiteTitle">-</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="metric-label">Description</div>
+                                        <div class="h6" id="websiteDescription">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="facebookResults" class="mb-4">
+                            <h3><i class="bi bi-facebook me-2 facebook-color"></i>Facebook</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="metric-label">Followers</div>
+                                        <div class="metric-value" id="facebookFollowers">-</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="metric-label">Engagement Metrics</div>
+                                        <div class="engagement-metrics">
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="facebookPosts">-</div>
+                                                <div class="engagement-label">Posts</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="facebookLikes">-</div>
+                                                <div class="engagement-label">Avg. Likes</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="facebookComments">-</div>
+                                                <div class="engagement-label">Avg. Comments</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="facebookEngagement">-</div>
+                                                <div class="engagement-label">Total Engagement</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="instagramResults" class="mb-4">
+                            <h3><i class="bi bi-instagram me-2 instagram-color"></i>Instagram</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="metric-label">Followers</div>
+                                        <div class="metric-value" id="instagramFollowers">-</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="metric-label">Engagement Metrics</div>
+                                        <div class="engagement-metrics">
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="instagramPosts">-</div>
+                                                <div class="engagement-label">Posts</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="instagramLikes">-</div>
+                                                <div class="engagement-label">Avg. Likes</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="instagramComments">-</div>
+                                                <div class="engagement-label">Avg. Comments</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="instagramEngagement">-</div>
+                                                <div class="engagement-label">Total Engagement</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- YouTube Results -->
+                        <div id="youtubeResults" class="mb-4">
+                            <h3><i class="bi bi-youtube me-2 youtube-color"></i>YouTube</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="metric-label">Subscribers</div>
+                                        <div class="metric-value" id="youtubeFollowers">-</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="metric-label">Engagement Metrics</div>
+                                        <div class="engagement-metrics">
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="youtubePosts">-</div>
+                                                <div class="engagement-label">Videos</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="youtubeLikes">-</div>
+                                                <div class="engagement-label">Avg. Likes</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="youtubeComments">-</div>
+                                                <div class="engagement-label">Avg. Comments</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="youtubeViews">-</div>
+                                                <div class="engagement-label">Avg. Views</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- LinkedIn Results -->
+                        <div id="linkedinResults" class="mb-4">
+                            <h3><i class="bi bi-linkedin me-2 linkedin-color"></i>LinkedIn</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="metric-label">Followers</div>
+                                        <div class="metric-value" id="linkedinFollowers">-</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="metric-label">Engagement Metrics</div>
+                                        <div class="engagement-metrics">
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="linkedinPosts">-</div>
+                                                <div class="engagement-label">Posts</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="linkedinLikes">-</div>
+                                                <div class="engagement-label">Avg. Likes</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="linkedinComments">-</div>
+                                                <div class="engagement-label">Avg. Comments</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="linkedinEngagement">-</div>
+                                                <div class="engagement-label">Total Engagement</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Twitter Results -->
+                        <div id="twitterResults" class="mb-4">
+                            <h3><i class="bi bi-twitter me-2 twitter-color"></i>Twitter/X</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="metric-label">Followers</div>
+                                        <div class="metric-value" id="twitterFollowers">-</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="metric-label">Engagement Metrics</div>
+                                        <div class="engagement-metrics">
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="twitterPosts">-</div>
+                                                <div class="engagement-label">Tweets</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="twitterLikes">-</div>
+                                                <div class="engagement-label">Avg. Likes</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="twitterRetweets">-</div>
+                                                <div class="engagement-label">Avg. Retweets</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="twitterReplies">-</div>
+                                                <div class="engagement-label">Avg. Replies</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- TikTok Results -->
+                        <div id="tiktokResults" class="mb-4">
+                            <h3><i class="bi bi-tiktok me-2 tiktok-color"></i>TikTok</h3>
+                            <div class="metric-card">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="metric-label">Followers</div>
+                                        <div class="metric-value" id="tiktokFollowers">-</div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="metric-label">Engagement Metrics</div>
+                                        <div class="engagement-metrics">
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="tiktokPosts">-</div>
+                                                <div class="engagement-label">Videos</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="tiktokLikes">-</div>
+                                                <div class="engagement-label">Avg. Likes</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="tiktokComments">-</div>
+                                                <div class="engagement-label">Avg. Comments</div>
+                                            </div>
+                                            <div class="engagement-metric">
+                                                <div class="engagement-value" id="tiktokEngagement">-</div>
+                                                <div class="engagement-label">Total Engagement</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>KPIs Social Extractor</h5>
+                    <p>A powerful tool for extracting and analyzing social media KPIs using a hybrid approach.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 KPIs Social Extractor</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const extractionForm = document.getElementById('extractionForm');
+            const loader = document.getElementById('loader');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Hide platform-specific result sections initially
+            document.getElementById('websiteResults').style.display = 'none';
+            document.getElementById('facebookResults').style.display = 'none';
+            document.getElementById('instagramResults').style.display = 'none';
+            document.getElementById('youtubeResults').style.display = 'none';
+            document.getElementById('linkedinResults').style.display = 'none';
+            document.getElementById('twitterResults').style.display = 'none';
+            document.getElementById('tiktokResults').style.display = 'none';
+            
+            extractionForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loader
+                loader.style.display = 'block';
+                resultsContainer.style.display = 'none';
+                
+                // Get form values
+                const websiteUrl = document.getElementById('websiteUrl').value;
+                const facebookUrl = document.getElementById('facebookUrl').value;
+                const instagramUrl = document.getElementById('instagramUrl').value;
+                const youtubeUrl = document.getElementById('youtubeUrl').value;
+                const linkedinUrl = document.getElementById('linkedinUrl').value;
+                const twitterUrl = document.getElementById('twitterUrl').value;
+                const tiktokUrl = document.getElementById('tiktokUrl').value;
+                
+                // Prepare request data
+                const requestData = {};
+                if (websiteUrl) requestData.website = websiteUrl;
+                if (facebookUrl) requestData.facebook = facebookUrl;
+                if (instagramUrl) requestData.instagram = instagramUrl;
+                if (youtubeUrl) requestData.youtube = youtubeUrl;
+                if (linkedinUrl) requestData.linkedin = linkedinUrl;
+                if (twitterUrl) requestData.twitter = twitterUrl;
+                if (tiktokUrl) requestData.tiktok = tiktokUrl;
+                
+                // Make API request
+                fetch('/api/extract', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Show results container
+                    resultsContainer.style.display = 'block';
+                    
+                    // Update results for each platform
+                    updateWebsiteResults(data.website);
+                    updateFacebookResults(data.facebook);
+                    updateInstagramResults(data.instagram);
+                    updateYouTubeResults(data.youtube);
+                    updateLinkedInResults(data.linkedin);
+                    updateTwitterResults(data.twitter);
+                    updateTikTokResults(data.tiktok);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loader.style.display = 'none';
+                    alert('An error occurred while extracting KPIs. Please try again.');
+                });
+            });
+            
+            function formatNumber(number) {
+                if (number === null || number === undefined) return '-';
+                
+                if (number >= 1000000) {
+                    return (number / 1000000).toFixed(1) + 'M';
+                } else if (number >= 1000) {
+                    return (number / 1000).toFixed(1) + 'K';
+                }
+                return number.toString();
+            }
+            
+            function updateWebsiteResults(data) {
+                const section = document.getElementById('websiteResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('websiteTitle').textContent = data.title || '-';
+                document.getElementById('websiteDescription').textContent = data.description || '-';
+            }
+            
+            function updateFacebookResults(data) {
+                const section = document.getElementById('facebookResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('facebookFollowers').textContent = formatNumber(data.followers);
+                
+                if (data.engagement) {
+                    document.getElementById('facebookPosts').textContent = formatNumber(data.engagement.posts);
+                    document.getElementById('facebookLikes').textContent = formatNumber(data.engagement.avg_likes);
+                    document.getElementById('facebookComments').textContent = formatNumber(data.engagement.avg_comments);
+                    document.getElementById('facebookEngagement').textContent = formatNumber(data.engagement.total_engagement);
+                }
+            }
+            
+            function updateInstagramResults(data) {
+                const section = document.getElementById('instagramResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('instagramFollowers').textContent = formatNumber(data.followers);
+                
+                if (data.engagement) {
+                    document.getElementById('instagramPosts').textContent = formatNumber(data.engagement.posts);
+                    document.getElementById('instagramLikes').textContent = formatNumber(data.engagement.avg_likes);
+                    document.getElementById('instagramComments').textContent = formatNumber(data.engagement.avg_comments);
+                    document.getElementById('instagramEngagement').textContent = formatNumber(data.engagement.total_engagement);
+                }
+            }
+            
+            function updateYouTubeResults(data) {
+                const section = document.getElementById('youtubeResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('youtubeFollowers').textContent = formatNumber(data.followers);
+                
+                if (data.engagement) {
+                    document.getElementById('youtubePosts').textContent = formatNumber(data.engagement.posts);
+                    document.getElementById('youtubeLikes').textContent = formatNumber(data.engagement.avg_likes);
+                    document.getElementById('youtubeComments').textContent = formatNumber(data.engagement.avg_comments);
+                    document.getElementById('youtubeViews').textContent = formatNumber(data.engagement.avg_views || data.engagement.total_engagement);
+                }
+            }
+            
+            function updateLinkedInResults(data) {
+                const section = document.getElementById('linkedinResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('linkedinFollowers').textContent = formatNumber(data.followers);
+                
+                if (data.engagement) {
+                    document.getElementById('linkedinPosts').textContent = formatNumber(data.engagement.posts);
+                    document.getElementById('linkedinLikes').textContent = formatNumber(data.engagement.avg_likes);
+                    document.getElementById('linkedinComments').textContent = formatNumber(data.engagement.avg_comments);
+                    document.getElementById('linkedinEngagement').textContent = formatNumber(data.engagement.total_engagement);
+                }
+            }
+            
+            function updateTwitterResults(data) {
+                const section = document.getElementById('twitterResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('twitterFollowers').textContent = formatNumber(data.followers);
+                
+                if (data.engagement) {
+                    document.getElementById('twitterPosts').textContent = formatNumber(data.engagement.posts);
+                    document.getElementById('twitterLikes').textContent = formatNumber(data.engagement.avg_likes);
+                    document.getElementById('twitterRetweets').textContent = formatNumber(data.engagement.avg_retweets);
+                    document.getElementById('twitterReplies').textContent = formatNumber(data.engagement.avg_replies);
+                }
+            }
+            
+            function updateTikTokResults(data) {
+                const section = document.getElementById('tiktokResults');
+                
+                if (!data) {
+                    section.style.display = 'none';
+                    return;
+                }
+                
+                section.style.display = 'block';
+                document.getElementById('tiktokFollowers').textContent = formatNumber(data.followers);
+                
+                if (data.engagement) {
+                    document.getElementById('tiktokPosts').textContent = formatNumber(data.engagement.posts);
+                    document.getElementById('tiktokLikes').textContent = formatNumber(data.engagement.avg_likes);
+                    document.getElementById('tiktokComments').textContent = formatNumber(data.engagement.avg_comments);
+                    document.getElementById('tiktokEngagement').textContent = formatNumber(data.engagement.total_engagement);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

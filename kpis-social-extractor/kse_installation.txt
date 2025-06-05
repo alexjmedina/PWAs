@@ -1,0 +1,136 @@
+# KPIs Social Extractor - Installation Guide
+
+This document provides step-by-step instructions for installing and running the KPIs Social Extractor application.
+
+## System Requirements
+
+- Python 3.8 or higher
+- pip (Python package manager)
+- Virtual environment (recommended)
+- Modern web browser (Chrome, Firefox, Edge)
+- Internet connection
+
+## Installation Steps
+
+### 1. Extract the ZIP File
+
+Extract the `kpis-social-extractor.zip` file to your preferred location.
+
+### 2. Create and Activate a Virtual Environment
+
+Navigate to the extracted directory and create a virtual environment:
+
+```bash
+# Navigate to the project directory
+cd kpis-social-extractor
+
+# Create a virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+Install all required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Install Playwright Browsers
+
+The application uses Playwright for web scraping. Install the required browsers:
+
+```bash
+playwright install chromium
+```
+
+### 5. Configure Environment Variables (Optional)
+
+If you have API keys for any of the social media platforms, create a `.env` file in the `app/config` directory:
+
+```bash
+cp app/config/.env.example app/config/.env
+```
+
+Then edit the `.env` file to add your API keys.
+
+## Running the Application
+
+### Start the Flask Server
+
+```bash
+# Make sure you're in the project root directory with the virtual environment activated
+python -m app.main
+```
+
+The server will start on http://localhost:5000 by default.
+
+### Access the Application
+
+Open your web browser and navigate to:
+- http://localhost:5000 - Main extraction interface
+- http://localhost:5000/dashboard - Analytics dashboard
+
+## Using the Application
+
+1. Enter the URLs of the social media profiles you want to analyze
+2. Click "Extract KPIs" to start the extraction process
+3. View the results on the page or navigate to the dashboard for visualizations
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Browser Installation Errors**:
+   ```bash
+   # Reinstall Playwright browsers
+   playwright install --force chromium
+   ```
+
+2. **Permission Errors**:
+   ```bash
+   # On Linux/macOS, ensure proper permissions
+   chmod -R 755 app
+   ```
+
+3. **Port Already in Use**:
+   ```bash
+   # Change the port in app/main.py or use an environment variable
+   PORT=5001 python -m app.main
+   ```
+
+### Logs
+
+Check the console output for detailed logs. The application uses Python's logging module to provide information about the extraction process.
+
+## Advanced Configuration
+
+### Proxy Configuration
+
+To use proxies for web scraping (recommended for production use):
+
+1. Edit `app/config/config.py`
+2. Set `USE_PROXIES = True`
+3. Add your proxy servers to the `PROXY_SERVERS` list
+
+### Headless Mode
+
+By default, browsers run in headless mode. To disable this for debugging:
+
+1. Edit `app/config/config.py`
+2. Set `HEADLESS = False`
+
+## Integration with Existing Systems
+
+The application provides a REST API that can be used to integrate with other systems:
+
+- `POST /api/extract` - Extract KPIs from multiple platforms
+- `POST /api/extract/<platform>` - Extract KPIs from a specific platform
+
+See the API documentation in `app/api/routes.py` for more details.
