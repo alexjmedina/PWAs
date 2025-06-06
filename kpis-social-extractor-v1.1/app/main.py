@@ -12,12 +12,12 @@ from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
 from app.extractors.base_extractor import HybridExtractor
-from .extractors.facebook_extractor import FacebookExtractor
-from .extractors.instagram_extractor import InstagramExtractor
-from .extractors.youtube_extractor import YouTubeExtractor
-from .extractors.linkedin_extractor import LinkedInExtractor
-from .extractors.twitter_extractor import TwitterExtractor
-from .extractors.tiktok_extractor import TikTokExtractor
+from app.extractors.facebook_extractor import FacebookExtractor
+from app.extractors.instagram_extractor import InstagramExtractor
+from app.extractors.youtube_extractor import YouTubeExtractor
+from app.extractors.linkedin_extractor import LinkedInExtractor
+from app.extractors.twitter_extractor import TwitterExtractor
+from app.extractors.tiktok_extractor import TikTokExtractor
 
 
 # Configure logging
