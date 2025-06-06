@@ -11,6 +11,7 @@ from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
 # Import the HybridExtractor and all specific extractor classes
+# NEW, CORRECTED IMPORTS (absolute)
 from app.extractors.base_extractor import HybridExtractor
 from app.extractors.facebook_extractor import FacebookExtractor
 from app.extractors.instagram_extractor import InstagramExtractor
