@@ -1,24 +1,23 @@
 """
 Main Application Module - KPIs Social Extractor
-
-This module initializes and configures the Flask application.
 """
-
+import sys
 import os
+# Add the project root to the path to allow for absolute imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import asyncio
 import logging
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
-# Import the HybridExtractor and all specific extractor classes
-# NEW, CORRECTED IMPORTS (absolute)
 from app.extractors.base_extractor import HybridExtractor
-from app.extractors.facebook_extractor import FacebookExtractor
-from app.extractors.instagram_extractor import InstagramExtractor
-from app.extractors.youtube_extractor import YouTubeExtractor
-from app.extractors.linkedin_extractor import LinkedInExtractor
-from app.extractors.twitter_extractor import TwitterExtractor
-from app.extractors.tiktok_extractor import TikTokExtractor
+from .extractors.facebook_extractor import FacebookExtractor
+from .extractors.instagram_extractor import InstagramExtractor
+from .extractors.youtube_extractor import YouTubeExtractor
+from .extractors.linkedin_extractor import LinkedInExtractor
+from .extractors.twitter_extractor import TwitterExtractor
+from .extractors.tiktok_extractor import TikTokExtractor
 
 
 # Configure logging
@@ -45,22 +44,18 @@ extractor.register_extractor("tiktok", TikTokExtractor())
 def create_app(test_config=None):
     """
     Create and configure the Flask application
-    
-    Args:
-        test_config: Test configuration to override default configuration
-        
-    Returns:
-        Flask application instance
     """
-    app = Flask(__name__, 
-                static_folder='static',
-                template_folder='templates')
+    # Note the change in static and template folder paths to be relative to the instance path
+    app = Flask(__name__, instance_relative_config=True,
+                static_folder='../static', 
+                template_folder='../templates')
     
     CORS(app)
     
-    if test_config is None:
-        app.config.from_pyfile('config.py', silent=True)
-    else:
+    # Load configuration from config.py
+    app.config.from_object('app.config.config.DevelopmentConfig')
+
+    if test_config is not None:
         app.config.from_mapping(test_config)
     
     try:
@@ -95,7 +90,6 @@ def create_app(test_config=None):
 
             for platform, url in urls_to_process.items():
                 if url:
-                    # Use the single, pre-configured extractor instance
                     tasks[platform] = extractor.extract_complete_kpi_data(platform, url)
 
             if not tasks:
