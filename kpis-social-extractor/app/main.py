@@ -32,9 +32,9 @@ def create_app(test_config=None):
         Flask application instance
     """
     # Create Flask app
-    app = Flask(__name__, 
-                static_folder='../static',
-                template_folder='../templates')
+    app = Flask(__name__,
+            static_folder='static',  # This will look for kpis-social-extractor/app/static/
+            template_folder='templates') # This will look for kpis-social-extractor/app/templates/
     
     # Enable CORS
     CORS(app)

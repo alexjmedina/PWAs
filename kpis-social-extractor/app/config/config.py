@@ -17,9 +17,8 @@ class Config:
     TESTING = False
     
     # API keys and tokens
-    FACEBOOK_API_KEY = os.environ.get('FACEBOOK_API_KEY')
-    INSTAGRAM_API_KEY = os.environ.get('INSTAGRAM_API_KEY')
-    TWITTER_API_KEY = os.environ.get('TWITTER_API_KEY')
+    META_ACCESS_TOKEN = os.environ.get('META_ACCESS_TOKEN')
+    TWITTER_API_KEY = os.environ.get('TWITTER_API_KEY')      
     TWITTER_API_SECRET = os.environ.get('TWITTER_API_SECRET')
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
     LINKEDIN_API_KEY = os.environ.get('LINKEDIN_API_KEY')
