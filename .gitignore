@@ -1,2 +1,11 @@
 *.pyc
 *.pyd
+*.typed
+*.h
+*.pyi
+*.pxd
+*.pem
+*.rst
+*.txt
+*.cfg
+*.proto
