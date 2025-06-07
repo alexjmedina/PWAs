@@ -1,24 +1,20 @@
-"""
-Main Application Module - KPIs Social Extractor
-"""
-import sys
-import os
-# Add the project root to the path to allow for absolute imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Correct file path for this code: kpis-social-extractor-v1.1/app/main.py
 
 import asyncio
 import logging
+import os
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
-from app.extractors.base_extractor import HybridExtractor
-from app.extractors.facebook_extractor import FacebookExtractor
-from app.extractors.instagram_extractor import InstagramExtractor
-from app.extractors.youtube_extractor import YouTubeExtractor
-from app.extractors.linkedin_extractor import LinkedInExtractor
-from app.extractors.twitter_extractor import TwitterExtractor
-from app.extractors.tiktok_extractor import TikTokExtractor
-
+# Relative imports because this file is inside the 'app' package
+from .extractors.base_extractor import HybridExtractor
+from .extractors.facebook_extractor import FacebookExtractor
+from .extractors.instagram_extractor import InstagramExtractor
+from .extractors.youtube_extractor import YouTubeExtractor
+from .extractors.linkedin_extractor import LinkedInExtractor
+from .extractors.twitter_extractor import TwitterExtractor
+from .extractors.tiktok_extractor import TikTokExtractor
+from .config.config import Config
 
 # Configure logging
 logging.basicConfig(
@@ -28,7 +24,6 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-
 logger = logging.getLogger(__name__)
 
 # --- Create and configure the extractor instance once when the app starts ---
@@ -43,17 +38,15 @@ extractor.register_extractor("tiktok", TikTokExtractor())
 
 def create_app(test_config=None):
     """
-    Create and configure the Flask application
+    Create and configure the Flask application.
+    When __name__ is 'app.main', Flask automatically finds static/templates in the 'app' folder.
     """
-    # Note the change in static and template folder paths to be relative to the instance path
-    app = Flask(__name__, instance_relative_config=True,
-                static_folder='../static', 
-                template_folder='../templates')
+    app = Flask(__name__, instance_relative_config=True)
     
     CORS(app)
     
-    # Load configuration from config.py
-    app.config.from_object('app.config.config.DevelopmentConfig')
+    # Load configuration
+    app.config.from_object(Config)
 
     if test_config is not None:
         app.config.from_mapping(test_config)
