@@ -21,6 +21,8 @@ from app.config.config import Config
 from app.utils.cache_manager import CacheManager
 from app.utils.rate_limiter import RateLimiter
 from app.utils.browser_pool import BrowserPool
+from ..config.config import Config
+from ..utils.human_simulation import HumanSimulation
 
 # Configure logging
 logger = logging.getLogger(__name__)
