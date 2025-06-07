@@ -10,7 +10,6 @@ class TwitterExtractor(BaseExtractor):
     def __init__(self):
         super().__init__()
         self.api_client = None
-        # Assumes TWITTER_API_KEY in .env is the Bearer Token
         bearer_token = self.config.TWITTER_API_KEY
         if bearer_token:
             try:
@@ -25,7 +24,7 @@ class TwitterExtractor(BaseExtractor):
         except IndexError:
             return None
 
-    def extract_followers(self, url: str) -> Optional[int]:
+    async def extract_followers(self, url: str) -> Optional[int]:
         if not self.api_client:
             logger.warning("Twitter API client not available.")
             return None
@@ -35,6 +34,8 @@ class TwitterExtractor(BaseExtractor):
             return None
             
         try:
+            # Note: Tweepy v2 calls are synchronous, so we don't 'await' them here.
+            # The async nature is handled by the overall application structure.
             response = self.api_client.get_user(username=username, user_fields=["public_metrics"])
             if response.data:
                 return response.data.public_metrics.get('followers_count')
@@ -42,6 +43,6 @@ class TwitterExtractor(BaseExtractor):
             logger.error(f"Twitter API error for followers: {e}")
         return None
 
-    def extract_engagement(self, url: str) -> Optional[Dict[str, Any]]:
+    async def extract_engagement(self, url: str) -> Optional[Dict[str, Any]]:
         logger.warning("Twitter engagement extraction not fully implemented in this version.")
         return None
